@@ -8,10 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	config "github.com/remotemobprogramming/mob/v4/configuration"
-	"github.com/remotemobprogramming/mob/v4/help"
-	"github.com/remotemobprogramming/mob/v4/open"
-	"github.com/remotemobprogramming/mob/v4/say"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -24,6 +20,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	config "github.com/remotemobprogramming/mob/v4/configuration"
+	"github.com/remotemobprogramming/mob/v4/help"
+	"github.com/remotemobprogramming/mob/v4/open"
+	"github.com/remotemobprogramming/mob/v4/say"
 )
 
 const (
@@ -232,6 +233,7 @@ func stringContains(list []string, element string) bool {
 func main() {
 	say.TurnOnDebuggingByArgs(os.Args)
 	say.Debug(runtime.Version())
+	say.Debug("Kejne's mob")
 
 	versionString := gitVersion()
 	if versionString == "" {
@@ -1082,14 +1084,7 @@ func makeWipCommit(configuration config.Configuration) {
 }
 
 func createWipCommitMessage(configuration config.Configuration) string {
-	commitMessage := configuration.WipCommitMessage
-
-	lastModifiedFilePath := getPathOfLastModifiedFile()
-	if lastModifiedFilePath != "" {
-		commitMessage += "\n\nlastFile:" + lastModifiedFilePath
-	}
-
-	return commitMessage
+	return configuration.WipCommitMessage
 }
 
 // uses git status --porcelain. To work properly files have to be staged.
@@ -1221,6 +1216,7 @@ func done(configuration config.Configuration) {
 	} else {
 		git("checkout", baseBranch.Name)
 		git("branch", "-D", wipBranch.Name)
+		git("pull")
 		say.Info("someone else already ended your session")
 	}
 	abortRunningTimers()
